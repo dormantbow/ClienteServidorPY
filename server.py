@@ -1,14 +1,24 @@
-from socket  import *
-from constCS import * #-
+import socket
 
-class Server:
-  def run(self):
-    s = socket(AF_INET, SOCK_STREAM) 
-    s.bind((HOST, PORT))  
-    s.listen(1)       
-    (conn, addr) = s.accept()  # returns new socket and addr. client 
-    while True:                # forever
-      data = conn.recv(1024)   # receive data from client
-      if not data: break       # stop if client stopped
-      conn.send(data+b"*")     # return sent data plus an "*"
-    conn.close()               # close the connection
+HOST = "0.0.0.0"
+PORT = 5000
+
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((HOST, PORT))
+server_socket.listen(1)
+
+print(f"Servidor escutando na porta {PORT}...")
+
+conn, addr = server_socket.accept()
+print(f"Conexão estabelecida com {addr}")
+
+while True:
+    data = conn.recv(1024).decode()
+    if data.strip().lower() == "exit":
+        print("Conexão encerrada pelo cliente.")
+        break
+    print(f"Mensagem recebida: {data.strip()}")
+    conn.send(data.encode())
+
+conn.close()
+server_socket.close()
